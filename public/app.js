@@ -172,7 +172,7 @@ function renderModels(){
   $('refresh-models').disabled=busy||loadingModels.has(provider);
   $('model-note').textContent=loadingModels.has(provider)?'正在读取官方模型目录…':catalog?.error || (model ? '可选推理强度因模型而异 · 设置在下次发送时生效，不影响已有上下文' : '连接平台后读取官方模型目录；未选择时沿用后台默认配置');
 }
-mountLocalSessions({api,action,onAttached:async (id,attachedProvider)=>{state=await(await fetch('/api/state')).json();selectedId=id;provider=attachedProvider||'codex';mode='live';$('execution-select').value=task().executionMode||'read-only';$('network-select').value=task().networkAccess?'on':'off';render();toast('已接入原项目与会话历史，发送消息后继续。');}});
+mountLocalSessions({api,action,onAttached:async (id,attachedProvider)=>{state=await(await fetch('/api/state')).json();selectedId=id;provider=attachedProvider||'codex';mode='live';$('execution-select').value=task().executionMode||'read-only';$('network-select').value=task().networkAccess?'on':'off';render();if(launch.get("screenshot")==="1")events.close();toast('已接入原项目与会话历史，发送消息后继续。');}});
 const labels = { idle:'准备开始', running:'正在执行', handoff:'任务交接中', completed:'已完成', failed:'执行失败', interrupted:'已停止',waiting_quota:'等待额度恢复',waiting_account:'等待可用账号' };
 // null means an unsent new chat; undefined follows the server's initial selection.
 const task = () => selectedId===null ? undefined : state?.tasks.find(t => t.id === (selectedId ?? state.selectedTaskId));
@@ -698,8 +698,11 @@ initCollapsiblePanels();
   const sidebar = document.querySelector('.sidebar');
   const sidebarToggle = $('sidebar-toggle');
   if (sidebar && sidebarToggle) {
-    const isSidebarCollapsed = localStorage.getItem('desk_sidebar_collapsed') === '1';
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramSidebar = urlParams.get('sidebar');
+    const isSidebarCollapsed = paramSidebar === 'collapsed' ? true : paramSidebar === 'expanded' ? false : localStorage.getItem('desk_sidebar_collapsed') === '1';
     if (isSidebarCollapsed) sidebar.classList.add('is-collapsed');
+    else sidebar.classList.remove('is-collapsed');
     sidebarToggle.setAttribute('aria-expanded', String(!isSidebarCollapsed));
     sidebarToggle.onclick = () => {
       const nowCollapsed = sidebar.classList.toggle('is-collapsed');
