@@ -1,0 +1,53 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import net from 'node:net';
+import {spawn} from 'node:child_process';
+import {randomUUID} from 'node:crypto';
+import {fileURLToPath} from 'node:url';
+import {createRelay} from '../remote-relay.mjs';
+import {paidFixture} from './paid-fixture.mjs';
+const root=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+async function freePort(){const server=net.createServer();await new Promise(r=>server.listen(0,'127.0.0.1',r));const port=server.address().port;await new Promise(r=>server.close(r));return port;}
+test('paid outbound relay runs real pairing, approval, task control and revocation; free cannot connect', {timeout:40000},async t=>{
+  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'desk-remote-'));
+  const fixture=paidFixture(directory,'basic',true),stateFile=path.join(directory,'state.json'),state=JSON.parse(fs.readFileSync(stateFile,'utf8'));state.membership.license=null;fs.writeFileSync(stateFile,JSON.stringify(state));
+  const [port,lanPort,relayPort]=await Promise.all([freePort(),freePort(),freePort()]),origin=`http://127.0.0.1:${port}`,relayOrigin=`http://127.0.0.1:${relayPort}`;
+  assert.throws(()=>createRelay({publicKey:fixture.publicKey,publicOrigin:relayOrigin}),/HTTPS/);
+  const relay=createRelay({publicKey:fixture.publicKey,publicOrigin:relayOrigin,test:true});await new Promise(r=>relay.listen(relayPort,'127.0.0.1',r));
+  let errors='';const child=spawn(process.execPath,[path.join(root,'server.mjs')],{windowsHide:true,env:{...process.env,AGENT_DESK_EDITION:'commercial',PORT:String(port),AGENT_DESK_REMOTE_PORT:String(lanPort),AGENT_DESK_DATA:directory,AGENT_DESK_TEST_NETWORK:'1',AGENT_DESK_LICENSE_PUBLIC_KEY_FILE:fixture.publicKeyFile},stdio:['ignore','pipe','pipe']});child.stderr.on('data',b=>errors+=b);
+  t.after(async()=>{if(child.exitCode===null){const ended=new Promise(r=>child.once('exit',r));child.kill();await ended;}relay.closeAllConnections();await new Promise(r=>relay.close(r));fs.rmSync(directory,{recursive:true,force:true});assert.equal(errors,'');});
+  await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);});
+  const first=await fetch(origin),cookie=first.headers.get('set-cookie').split(';')[0];
+  async function owner(route,body){const response=await fetch(origin+'/api/'+route,{method:body===undefined?'GET':'POST',headers:{Cookie:cookie,Origin:origin,'X-Agent-Desk':'1','X-Request-Id':randomUUID(),'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)})});return {status:response.status,body:await response.json()};}
+  assert.equal((await owner('remote/connect',{url:relayOrigin})).status,403);
+  assert.equal((await owner('membership/activate',{license:fixture.license})).status,200);
+  for(const provider of ['codex','antigravity'])for(let i=0;i<2;i++)assert.equal((await owner('accounts/add',{provider,name:'测试'+i,identifier:provider+i+'@example.test',passwordProvided:true})).status,200);
+  assert.equal((await owner('accounts/add',{provider:'codex',name:'超额',identifier:'extra@example.test',passwordProvided:true})).status,403);
+  assert.equal((await owner('membership')).body.slots.length,4);
+  assert.equal((await owner('remote/connect',{url:relayOrigin})).status,200);
+  const invite=(await owner('remote/pairing',{})).body,base=`${relayOrigin}/d/${fixture.installationId}`;
+  const page=await fetch(base+'/mobile');assert.equal(page.status,200);assert.ok((await page.text()).includes(`/d/${fixture.installationId}/mobile.js`));
+  let phoneCookie='';
+  async function phone(route,body,id=randomUUID(),extra={}){const response=await fetch(base+'/api/'+route,{method:body===undefined?'GET':'POST',headers:{Cookie:phoneCookie,Origin:relayOrigin,'X-Agent-Desk':'1','X-Request-Id':id,'Content-Type':'application/json',...extra},...(body===undefined?{}:{body:JSON.stringify(body)})});if(response.headers.has('set-cookie'))phoneCookie=response.headers.get('set-cookie').split(';')[0];return {status:response.status,body:await response.json()};}
+  const token=new URL(invite.url).hash.slice(6),pairId=randomUUID();const pair=await phone('device/pair',{token,name:'跨网络测试手机'},pairId);assert.equal(pair.status,200);
+  assert.equal((await phone('state')).status,403);
+  assert.equal((await owner('devices/approve',{deviceId:pair.body.device.id})).status,200);
+  assert.equal((await phone('state')).status,200);
+  assert.equal((await phone('accounts/add',{provider:'codex'})).status,403);
+  assert.equal((await phone('task',{goal:'测试',mode:'demo'},randomUUID(),{Origin:'https://wrong.example'})).status,403);
+  const payload={goal:'跨网络核验演示任务',mode:'demo'},requestId=randomUUID();
+  const [one,two]=await Promise.all([phone('task',payload,requestId),phone('task',payload,requestId)]);assert.equal(one.status,200);assert.equal(one.body.taskId,two.body.taskId);
+  const taskId=one.body.taskId;assert.equal((await phone('run',{taskId})).status,200);
+  assert.equal((await phone('stop',{taskId})).status,200);
+  const snapshot=(await phone('state')).body;assert.equal(snapshot.tasks.filter(t=>t.id===taskId).length,1);assert.equal(snapshot.membership,undefined);assert.equal(snapshot.tasks.find(t=>t.id===taskId).status,'interrupted');
+  const cached=await phone(`state?taskId=${taskId}&revision=${snapshot.revision}`);assert.deepEqual(cached.body,{unchanged:true});
+  const changed=await phone('task',{goal:'冲突指令',mode:'demo'},requestId);assert.equal(changed.status,409);
+  const next=await phone('task',{goal:'第二个任务',mode:'demo'});assert.equal(next.status,200);
+  const focused=(await phone(`state?taskId=${taskId}&revision=${snapshot.revision}`)).body;assert.equal(focused.projectionTaskId,taskId);assert.equal(focused.tasks.find(t=>t.id===next.body.taskId).fileContents.length,0);assert.ok(focused.revision>snapshot.revision);
+  const badRegister=await fetch(relayOrigin+'/control/register',{method:'POST',headers:{'Content-Type':'application/json','X-Desktop-Id':fixture.installationId,Authorization:'Bearer '+'0'.repeat(64)},body:JSON.stringify({license:fixture.license})});assert.equal(badRegister.status,403);
+  assert.equal((await owner('devices/revoke',{deviceId:pair.body.device.id})).status,200);assert.equal((await phone('state')).status,401);
+  assert.equal((await owner('remote/disconnect',{})).status,200);
+});

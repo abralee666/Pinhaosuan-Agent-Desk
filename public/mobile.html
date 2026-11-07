@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#f6f8f7">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="referrer" content="no-referrer">
+  <title>拼好算 · 手机控制</title>
+  <link rel="icon" href="/brand/pinghaosuan-logo-selected.png">
+  <link rel="stylesheet" href="/mobile.css">
+  <script src="/mobile.js" defer></script>
+</head>
+<body>
+  <div class="mobile-layout">
+    <header class="mobile-topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="/mobile" aria-label="拼好算手机控制首页">
+          <img src="/brand/pinghaosuan-logo-selected.png" width="34" height="34" alt="拼好算Logo">
+          <div class="brand-text">
+            <span class="brand-name">拼好算</span>
+            <span class="brand-pill">移动控制</span>
+          </div>
+        </a>
+        <div class="topbar-actions">
+          <span id="connection" class="connection-status" role="status"><i></i>未连接</span>
+          <button id="new-task" class="btn-new-task" type="button" aria-label="新建任务">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>新建</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mobile-main">
+      <!-- 配对卡片 -->
+      <section id="pair-panel" class="card pair-card" aria-labelledby="pair-title">
+        <div class="pair-icon-wrapper" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12m16 0H4m16 0 1.28 2.55A1 1 0 0 1 20.38 20H3.62a1 1 0 0 1-.9-1.45L4 16"/><circle cx="12" cy="10" r="2"/></svg>
+        </div>
+        <h1 id="pair-title">连接你的电脑</h1>
+        <p id="pair-description">在电脑端打开“手机控制”，开启局域网连接，再用手机扫描配对二维码。手机与电脑需要连接同一网络。</p>
+        
+        <div id="pair-pending" class="notice pair-notice" hidden>
+          <span class="pending-pulse" aria-hidden="true"></span>
+          <div class="notice-body">
+            <strong>等待电脑确认连接</strong>
+            <p>连接码：<strong id="pair-code" class="pair-code-text"></strong><br>请在电脑屏幕上核对相同的连接码，并点击“允许连接”。</p>
+          </div>
+        </div>
+
+        <form id="pair-form" class="pair-link-form" hidden>
+          <label for="pair-link">也可以粘贴电脑端的配对链接</label>
+          <div class="input-with-button">
+            <input id="pair-link" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="粘贴电脑端生成的配对链接">
+            <button class="button primary full" id="pair-submit" type="submit">申请连接</button>
+          </div>
+        </form>
+
+        <button id="check-pair" class="button secondary full" type="button">重新检查连接</button>
+        <p id="pair-error" class="error-text" role="alert" hidden></p>
+      </section>
+
+      <!-- 工作区主视图 -->
+      <div id="workspace" class="workspace-view" hidden>
+        <!-- 任务总览头部卡片 -->
+        <section class="card task-header-card" aria-labelledby="task-list-title">
+          <div class="task-selector-row">
+            <label id="task-list-title" class="sr-only" for="task-select">选择任务</label>
+            <select id="task-select" class="sr-only" tabindex="-1" aria-hidden="true"><option value="">暂无任务</option></select>
+
+            <button id="task-picker-trigger" class="task-picker-btn" type="button" aria-haspopup="dialog" aria-expanded="false" title="点击切换任务">
+              <div class="picker-left">
+                <span class="picker-icon-badge">📋</span>
+                <span id="task-picker-label" class="picker-title-text">从电脑上的任务开始</span>
+              </div>
+              <div class="picker-right">
+                <span class="picker-chip-switch">切换</span>
+                <svg class="picker-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </div>
+            </button>
+
+            <div class="task-badge-group">
+              <span id="task-status" class="status-label">准备开始</span>
+              <span id="active-agent" class="agent-tag">暂无任务</span>
+            </div>
+          </div>
+
+          <div class="task-info">
+            <h2 id="task-goal" class="task-title">从电脑上的任务开始</h2>
+            <p id="task-note" class="task-note-text">可以查看进度、上传资料并补充指令，也可以新建一个待执行的任务。</p>
+          </div>
+
+          <div class="task-actions">
+            <button id="stop-task" class="button danger outline" hidden type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
+              <span>暂停任务</span>
+            </button>
+            <button id="resume-task" class="button primary" hidden type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>从检查点继续</span>
+            </button>
+          </div>
+          <p id="recovery-note" class="recovery-hint" hidden></p>
+        </section>
+
+        <!-- 分段导航标签 (Tabs) -->
+        <nav class="mobile-tabs" role="tablist">
+          <button type="button" class="tab-btn active" data-tab="timeline" role="tab" aria-selected="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span>对话记录</span>
+            <span id="event-count" class="tab-badge">0</span>
+          </button>
+          <button type="button" class="tab-btn" data-tab="files" role="tab" aria-selected="false">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            <span>成果文件</span>
+            <span id="file-count" class="tab-badge">0</span>
+          </button>
+          <button type="button" class="tab-btn" data-tab="settings" role="tab" aria-selected="false">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span>执行配置</span>
+          </button>
+        </nav>
+
+        <!-- 标签内容区 -->
+        <div class="tabs-body">
+          <!-- 标签 1: 对话记录 -->
+          <section id="tab-timeline-panel" class="tab-panel active" aria-labelledby="timeline-title">
+            <h2 id="timeline-title" class="sr-only">执行记录</h2>
+            <div id="timeline" class="timeline-container" tabindex="0" aria-label="任务执行记录">
+              <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <p>暂无执行记录<br><small>在下方输入指令或上传文件开始交互</small></p>
+              </div>
+            </div>
+          </section>
+
+          <!-- 标签 2: 成果文件 -->
+          <section id="tab-files-panel" class="tab-panel" aria-labelledby="files-title" hidden>
+            <div class="section-heading">
+              <h2 id="files-title">任务产出文件</h2>
+              <span class="muted small">轻触文件名即可预览详情</span>
+            </div>
+            <div id="files" class="files-grid">
+              <p class="empty-state">当前任务还没有成果文件</p>
+            </div>
+          </section>
+
+          <!-- 标签 3: 执行配置 -->
+          <section id="tab-settings-panel" class="tab-panel" aria-labelledby="settings-title" hidden>
+            <div class="section-heading">
+              <h2 id="settings-title">执行权限与平台偏好</h2>
+            </div>
+            <div class="settings-card">
+              <div class="setting-item">
+                <label for="provider">执行平台</label>
+                <select id="provider" class="sr-only" tabindex="-1" aria-hidden="true">
+                  <option value="codex">Codex (官方平台)</option>
+                  <option value="antigravity">Antigravity (多模型)</option>
+                </select>
+                <div class="segmented-pill-group" data-target="provider">
+                  <button type="button" class="segmented-pill-btn active" data-val="codex">
+                    <span class="pill-dot codex"></span>
+                    <span>Codex 官方平台</span>
+                  </button>
+                  <button type="button" class="segmented-pill-btn" data-val="antigravity">
+                    <span class="pill-dot antigravity"></span>
+                    <span>Antigravity 多模型</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label for="execution">执行模式与权限</label>
+                <select id="execution" class="sr-only" tabindex="-1" aria-hidden="true">
+                  <option value="read-only">仅生成回复 (只读)</option>
+                  <option value="workspace">允许修改任务文件</option>
+                  <option value="full-access" disabled>完全访问 (需电脑端授权)</option>
+                </select>
+                <div class="segmented-cards-group" data-target="execution">
+                  <button type="button" class="segmented-card-btn active" data-val="read-only">
+                    <div class="seg-card-header">
+                      <span class="seg-card-badge">只读</span>
+                      <strong class="seg-card-title">仅生成回复</strong>
+                    </div>
+                    <p class="seg-card-desc">安全分析对话，不修改电脑上的任何项目文件</p>
+                  </button>
+                  <button type="button" class="segmented-card-btn" data-val="workspace">
+                    <div class="seg-card-header">
+                      <span class="seg-card-badge">工作区</span>
+                      <strong class="seg-card-title">允许修改任务文件</strong>
+                    </div>
+                    <p class="seg-card-desc">可在独立工作区中编写代码、读写文件与产出成果</p>
+                  </button>
+                  <button type="button" class="segmented-card-btn is-disabled" data-val="full-access" disabled>
+                    <div class="seg-card-header">
+                      <span class="seg-card-badge">授权</span>
+                      <strong class="seg-card-title">完全访问 (需电脑端授权)</strong>
+                    </div>
+                    <p class="seg-card-desc">拥有最高系统控制权，仅可在电脑端手动开启</p>
+                  </button>
+                </div>
+              </div>
+
+              <div class="setting-item">
+                <label for="network">网络访问权限</label>
+                <select id="network" class="sr-only" tabindex="-1" aria-hidden="true">
+                  <option value="off">禁止联网</option>
+                  <option value="on">允许联网</option>
+                </select>
+                <div class="segmented-pill-group" data-target="network">
+                  <button type="button" class="segmented-pill-btn active" data-val="off">
+                    <span class="pill-dot off"></span>
+                    <span>禁止联网</span>
+                  </button>
+                  <button type="button" class="segmented-pill-btn" data-val="on">
+                    <span class="pill-dot on"></span>
+                    <span>允许联网</span>
+                  </button>
+                </div>
+              </div>
+
+              <p id="execution-note" class="settings-hint">默认仅生成回复。选择“允许修改任务文件”后，Agent 可在电脑的任务工作区内读写文件与产出交付物。</p>
+            </div>
+          </section>
+        </div>
+
+        <!-- 底部吸底指令与附件发送框 (Composer) -->
+        <section class="mobile-composer-bar" aria-labelledby="composer-title">
+          <h2 id="composer-title" class="sr-only">补充指令</h2>
+
+          <!-- 附件预览滑轨 (有待发送附件时显示) -->
+          <div id="composer-attachments" class="composer-attachments-tray" hidden></div>
+
+          <!-- 隐藏的文件上传 input，支持各类文档、图片、代码等 -->
+          <input type="file" id="attachment-input" multiple hidden>
+
+          <form id="composer-form" class="composer-input-form">
+            <div class="composer-toolbar-left">
+              <button id="attachment-btn" type="button" class="composer-tool-btn" title="上传文件或图片" aria-label="上传文件">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                <span id="attachment-badge" class="attachment-badge" hidden>0</span>
+              </button>
+            </div>
+
+            <div class="composer-input-wrap">
+              <label class="sr-only" for="prompt">任务指令</label>
+              <textarea id="prompt" rows="1" maxlength="6000" placeholder="发送指令、提问或配合附件要求…"></textarea>
+            </div>
+
+            <div class="composer-toolbar-right">
+              <button id="send" class="btn-send-action" type="submit" aria-label="发送指令" title="发送">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </div>
+          </form>
+
+          <div class="composer-footer-info">
+            <span id="device-caption" class="device-text">任务与文件保存在电脑上</span>
+            <span id="send-note" class="send-hint">账号登录与模型配置在电脑端完成</span>
+          </div>
+        </section>
+
+        <footer class="page-footer">
+          <span>电脑执行 · 两端实时同步</span>
+          <button id="refresh-state" class="btn-refresh-state" type="button">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            <span>刷新状态</span>
+          </button>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <!-- 新建任务弹窗 -->
+  <dialog id="new-dialog" class="mobile-dialog">
+    <form id="new-form" class="modal-form">
+      <div class="dialog-heading">
+        <h2>新建任务</h2>
+        <button class="close-button" data-close="new-dialog" type="button" aria-label="关闭">×</button>
+      </div>
+      <label for="new-goal" class="dialog-field-label">任务目标与需求</label>
+      <textarea id="new-goal" rows="4" maxlength="6000" required placeholder="例如：整理今日会议纪要并输出思维导图结构，或分析附带的数据文件…"></textarea>
+      <p class="dialog-tip">新建后，将在电脑端创建独立工作区。您可直接在手机端补充附件并发送指令执行。</p>
+      <div class="dialog-actions">
+        <button id="create-task" class="button primary full" type="submit">创建待执行任务</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- 文件预览弹窗 -->
+  <dialog id="file-dialog" class="mobile-dialog file-dialog">
+    <div class="dialog-heading">
+      <div class="file-title-wrap">
+        <span class="file-preview-icon">📄</span>
+        <h2 id="file-title">文件预览</h2>
+      </div>
+      <div class="file-dialog-actions">
+        <button id="copy-file-btn" class="btn-copy-file" type="button" title="复制内容">复制</button>
+        <button class="close-button" data-close="file-dialog" type="button" aria-label="关闭">×</button>
+      </div>
+    </div>
+    <div class="file-content-scroll">
+      <pre id="file-content" tabindex="0"></pre>
+    </div>
+  </dialog>
+
+  <!-- 重试操作弹窗 -->
+  <dialog id="retry-dialog" class="mobile-dialog">
+    <div class="dialog-heading">
+      <h2>尚未确认执行结果</h2>
+    </div>
+    <p>网络连接暂时中断，电脑可能已经收到这条操作。点击重试会沿用相同编号确认，避免重复扣额度或重复执行。</p>
+    <div class="retry-actions">
+      <button id="retry-command" class="button primary full" type="button">重试并确认结果</button>
+      <button id="dismiss-retry" class="button secondary full" type="button">稍后确认</button>
+    </div>
+  </dialog>
+
+  <!-- 浮动提示 Toast -->
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <!-- 手机端半屏精致任务抽屉 (Bottom Sheet Drawer) -->
+  <div id="task-sheet" class="bottom-sheet-overlay" hidden aria-modal="true" role="dialog" aria-labelledby="sheet-title">
+    <div id="task-sheet-backdrop" class="bottom-sheet-backdrop"></div>
+    <div class="bottom-sheet-panel">
+      <div class="bottom-sheet-handle-wrap">
+        <div class="bottom-sheet-handle"></div>
+      </div>
+      <header class="bottom-sheet-header">
+        <div class="sheet-header-info">
+          <div class="sheet-title-row">
+            <h3 id="sheet-title">切换任务</h3>
+            <span id="task-sheet-counter" class="sheet-counter-badge">0 个任务</span>
+          </div>
+          <p class="sheet-subtitle">轻触卡片切换当前手机端查看与操作的任务</p>
+        </div>
+        <div class="sheet-header-actions">
+          <button id="task-sheet-new-btn" class="sheet-action-new" type="button">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>新建任务</span>
+          </button>
+          <button id="task-sheet-close" class="sheet-action-close" type="button" aria-label="关闭抽屉">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </header>
+      <div id="task-sheet-list" class="bottom-sheet-list" role="listbox">
+        <!-- 动态渲染任务卡片 -->
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

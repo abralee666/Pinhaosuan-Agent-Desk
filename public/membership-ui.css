@@ -1,0 +1,80 @@
+.membership-dialog{box-sizing:border-box;border:1px solid #e5e5e5;border-radius:22px;padding:36px 32px 26px;width:min(1280px,calc(100vw - 48px));max-width:calc(100vw - 48px);max-height:90vh;overflow:auto;color:#202020;background:#fff;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;box-shadow:0 24px 80px #00000018}
+.membership-dialog::backdrop{background:#00000050;backdrop-filter:blur(2px)}
+.membership-close{position:absolute;top:16px;right:18px;display:grid;place-items:center;width:32px;height:32px;border:0;border-radius:50%;background:none;color:#737373;font-size:25px;cursor:pointer}
+.membership-close:hover{background:#f4f4f4;color:#202020}
+.membership-heading{text-align:center}.membership-eyebrow{font-size:12px;color:#737373}.membership-heading h2{margin:10px 0 8px;font-size:28px;line-height:1.3;font-weight:600;letter-spacing:-.7px}.membership-heading>p{margin:0;font-size:14px;color:#737373;line-height:1.65}.membership-current{font-size:12px;color:#777;margin:10px 0 20px}
+.membership-tabs{display:flex;justify-content:center;gap:26px;border-bottom:1px solid #ededed;margin-bottom:22px}.membership-tabs button{padding:10px 2px 13px;border:0;border-bottom:2px solid transparent;background:none;color:#777;font-size:13px;cursor:pointer}.membership-tabs button[aria-selected=true]{color:#202020;border-bottom-color:#202020;font-weight:600}
+.membership-billing{display:flex;justify-content:center;gap:3px;align-items:center;margin:0 auto 26px;padding:4px;width:max-content;border:1px solid #eaeaea;border-radius:30px;background:#f5f5f5}.membership-billing button{border:0;border-radius:24px;padding:8px 17px;background:transparent;color:#777;font-size:13px;cursor:pointer}.membership-billing button[aria-pressed=true]{background:#fff;color:#202020;box-shadow:0 1px 4px #00000013}.membership-billing span{font-size:10px;margin-left:5px;color:#527563}
+.membership-plans{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch}.membership-plan{min-width:0;border:1px solid #e4e4e4;border-radius:17px;padding:22px 18px 26px;background:white}.membership-plan.selected{border-color:#333;background:#fafafa}.membership-plan-heading{display:flex;align-items:center;justify-content:space-between;gap:5px;min-height:26px}.membership-plan h3{margin:0;font-size:19px;font-weight:600}.membership-badge{font-size:10px;background:#eee;color:#555;padding:4px 6px;border-radius:12px;white-space:nowrap}.membership-plan-description{margin:8px 0 24px;font-size:12px;color:#777;line-height:1.6;min-height:20px}.membership-price{display:flex;align-items:baseline;gap:2px;height:48px;white-space:nowrap}.membership-price>span{font-size:18px;font-weight:500}.membership-price strong{font-size:38px;line-height:1.2;font-weight:600;letter-spacing:-1.5px;font-variant-numeric:tabular-nums}.membership-price small{font-size:12px;color:#777;margin-left:4px}.membership-price-note{font-size:11px;color:#777;min-height:18px;line-height:1.6;margin:7px 0 20px}.membership-plan-cta{width:100%;padding:11px 7px;border:1px solid #202020;border-radius:24px;background:#202020;color:white;cursor:pointer;font-size:12px;font-weight:500}.membership-plan-cta:hover{background:#383838}.membership-plan-cta:disabled{background:#f0f0f0;border-color:#e2e2e2;color:#777;cursor:default}.membership-features{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:13px}.membership-features li{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.55;color:#414141}.membership-features svg{width:15px;height:15px;flex-shrink:0;margin-top:2px;color:#484848}
+.membership-shared{text-align:center;font-size:12px;color:#555;line-height:1.8;margin:20px 0 14px}.membership-disclosures{max-width:850px;margin:auto;text-align:center;font-size:11px;line-height:1.8;color:#858585}.membership-disclosures p{margin:4px 0}.membership-note{font-size:12px;line-height:1.8;color:#777}.membership-dialog #settings-panel{max-width:760px;margin:auto}.membership-dialog section{border-top:1px solid #ededed;padding:16px 0 6px;margin-top:14px}.membership-dialog section:first-child{border-top:0;margin-top:0;padding-top:0}.membership-dialog h3{font-size:15px;font-weight:600;margin:10px 0}.membership-dialog h3 small{font-size:10px;font-weight:400;color:#777;margin-left:4px}.membership-check{display:flex;align-items:center;gap:9px;font-size:13px;line-height:1.7;cursor:pointer}.membership-check input{accent-color:#242424;width:16px;height:16px}
+.membership-dialog form{display:flex;align-items:end;gap:10px;margin:12px 0}.membership-dialog form label{flex:1;min-width:0;font-size:12px;color:#555}.membership-dialog input:not([type=checkbox]),.membership-dialog textarea{display:block;box-sizing:border-box;width:100%;border:1px solid #dcdcdc;border-radius:10px;padding:11px;margin-top:7px;background:#fff;color:#222;resize:vertical;font-family:inherit;font-size:13px}.membership-dialog .membership-action{border:1px solid #202020;border-radius:22px;background:#202020;color:white;padding:11px 17px;cursor:pointer;white-space:nowrap;font-size:12px}.membership-dialog button:disabled{cursor:default;opacity:.6}.membership-plan-cta:disabled{opacity:1}.membership-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;font-size:12px}.membership-row small{display:block;color:#777;font-size:11px;margin-top:5px;line-height:1.6}.membership-row button{border:1px solid #ddd;border-radius:20px;padding:8px 12px;background:white;color:#444;font-size:12px;cursor:pointer;white-space:nowrap}.membership-error{border:1px solid #f0d9d3;border-radius:10px;padding:10px;background:#fff8f6;color:#923c2c;font-size:12px;margin:12px 0}.membership-pair{padding:16px;background:#fafafa;border:1px solid #e6e6e6;border-radius:12px}.membership-pair img{width:168px;height:168px}.membership-pair p{font-size:12px;color:#777}.membership-installation{display:block;font-size:11px;overflow-wrap:anywhere;color:#777}.membership-dialog summary{cursor:pointer;margin:15px 0;font-size:13px;color:#555}.membership-dialog button:focus-visible,.sentinel-info:focus-visible,.sentinel-checkbox input:focus-visible{outline:2px solid #777;outline-offset:3px}
+.sentinel-block{box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:18px;padding:16px 20px;margin:0 0 20px;border:1px solid #e2e7e3;border-radius:12px;background:#fff}.sentinel-title{display:flex;align-items:center;gap:7px}.sentinel-title>label{font-size:14px;font-weight:600;color:#35483b;cursor:pointer}.sentinel-content p{margin:6px 0 0;color:#7d8881;font-size:12px;line-height:1.5}.sentinel-checkbox{display:flex;align-items:center;gap:8px;font-size:12px;color:#5b685f;cursor:pointer;white-space:nowrap}.sentinel-checkbox input{width:17px;height:17px;accent-color:#384e40;cursor:pointer;margin:0}.sentinel-checkbox input:disabled{cursor:wait}.sentinel-information{position:relative;display:inline-flex;flex-shrink:0;align-items:center}.sentinel-info{box-sizing:border-box;display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;background:transparent;color:#a0a0a0;cursor:help;border-radius:50%}.sentinel-info:hover{color:#727272}.sentinel-tooltip{position:absolute;z-index:30;left:0;top:calc(100% + 8px);width:360px;max-width:calc(100vw - 90px);box-sizing:border-box;padding:15px 17px;background:#303030;color:#eee;border:1px solid #404040;border-radius:11px;box-shadow:0 8px 26px #00000020;font-size:12px;line-height:1.85;font-weight:400;opacity:0;visibility:hidden;transition:opacity .12s,visibility .12s;pointer-events:none;text-align:left}.sentinel-tooltip:before{content:'';position:absolute;top:-5px;left:5px;width:8px;height:8px;background:#303030;border-left:1px solid #404040;border-top:1px solid #404040;transform:rotate(45deg)}.sentinel-tooltip strong{display:block;font-size:12px;font-weight:600;color:white;margin-bottom:5px}.sentinel-tooltip>span{display:block}.sentinel-tooltip>span+span{margin-top:8px;color:#ccc}.sentinel-information:hover .sentinel-tooltip,.sentinel-information:focus-within .sentinel-tooltip,.sentinel-information:has([aria-expanded=true]) .sentinel-tooltip{opacity:1;visibility:visible}.membership-sentinel-settings .sentinel-title h3{margin-right:0}
+@media(max-width:1150px){.membership-dialog{padding:30px 24px 24px}.membership-plans{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.membership-plan{padding:22px}.membership-plan-description{margin-bottom:18px}.membership-features{gap:10px}}
+@media(max-width:580px){.membership-dialog{padding:28px 16px 22px;width:calc(100vw - 20px);max-width:calc(100vw - 20px);max-height:92vh;border-radius:18px}.membership-heading h2{font-size:23px}.membership-heading>p{font-size:12px}.membership-tabs{margin-bottom:18px}.membership-billing{margin-bottom:20px}.membership-plans{grid-template-columns:1fr;gap:13px}.membership-plan{padding:22px}.membership-plan-description{margin-bottom:14px}.membership-features{margin-top:18px}.membership-dialog form{flex-direction:column;align-items:stretch}.membership-row{flex-wrap:wrap}.sentinel-block{padding:14px 16px;gap:10px}.sentinel-title>label{font-size:13px}.sentinel-content p{font-size:11px}.sentinel-tooltip{left:-80px;max-width:calc(100vw - 50px);width:330px}.sentinel-tooltip:before{left:85px}}
+@media(prefers-reduced-motion:reduce){.sentinel-tooltip{transition:none}}
+
+.membership-service-addon{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid #e8e8e8;border-bottom:1px solid #e8e8e8;margin-top:22px;padding:16px 4px}.membership-service-addon strong{font-size:13px;font-weight:500;color:#3b3b3b}.membership-service-addon strong span{margin-left:12px;font-weight:600;font-variant-numeric:tabular-nums}.membership-service-addon p{margin:6px 0 0;font-size:11px;line-height:1.7;color:#888}.membership-service-addon button{flex-shrink:0;border:1px solid #ddd;border-radius:20px;background:#fff;color:#444;font-size:12px;padding:9px 15px;cursor:pointer}.membership-service-addon button:hover{border-color:#999;background:#fafafa}
+@media(max-width:580px){.membership-service-addon{gap:12px;padding:15px 0}.membership-service-addon strong{display:grid;gap:6px}.membership-service-addon strong span{margin-left:0}.membership-service-addon button{padding:9px 12px}}
+/* The workspace sentinel is a single lightweight status row. */
+.sentinel-block{justify-content:flex-start;gap:14px;padding:6px 12px;margin:0 0 12px;min-height:36px;border-radius:8px;border-color:#e5eae7;background:transparent}
+.sentinel-content{display:flex;align-items:center;gap:12px;min-width:0;flex:1;flex-wrap:wrap}
+.sentinel-title{gap:4px}
+.sentinel-title>label{font-size:11px;font-weight:500;white-space:nowrap}
+.sentinel-content p{margin:0;font-size:10px;color:#98a29b}
+.sentinel-checkbox{gap:6px;font-size:11px}
+.sentinel-checkbox input{width:14px;height:14px}
+.sentinel-info{width:20px;height:20px}
+@media(max-width:580px){.sentinel-block{padding:6px 10px;gap:8px}.sentinel-content{gap:4px 10px}.sentinel-title>label{font-size:11px}.sentinel-content p{font-size:10px}.sentinel-tooltip{left:-30px}.sentinel-tooltip:before{left:35px}}
+.automation-grid>.sentinel-block{margin:0;min-height:112px;padding:14px 16px;border-radius:12px;background:#fff;align-items:flex-start;gap:12px}
+.automation-grid .sentinel-content{display:block}
+.automation-grid .sentinel-title>label{font-size:13px;font-weight:600}
+.automation-grid .sentinel-content p{margin:10px 0 0;font-size:12px;color:#859189;line-height:1.7;max-width:210px}
+.automation-grid .sentinel-checkbox{font-size:12px;min-height:24px;gap:7px}
+.automation-grid .sentinel-checkbox input{width:16px;height:16px}
+.automation-grid .sentinel-info{width:24px;height:24px}
+.automation-grid>.sentinel-block,.automation-grid>#relay-panel,.automation-grid>#relay-panel.is-collapsed{min-height:120px}
+.automation-grid>.sentinel-block,.automation-grid>#relay-panel,.automation-grid>#relay-panel.is-collapsed{min-height:168px}
+.automation-grid>.sentinel-block{flex-wrap:wrap;align-content:flex-start;gap:10px}
+.automation-grid .sentinel-content{flex-basis:100%}
+.automation-grid .sentinel-content p{margin-top:8px;font-size:12px}
+.automation-grid .sentinel-checkbox{margin-top:2px}
+.automation-grid>#pool-panel,.automation-grid>.sentinel-block,.automation-grid>#relay-panel,.automation-grid>#relay-panel.is-collapsed{min-height:170px}
+.automation-grid #pool-panel #pool-status{overflow-wrap:anywhere}
+/* Recovery and relay use their own compact height beside the account card. */
+.automation-grid>.sentinel-block,.automation-grid>#relay-panel,.automation-grid>#relay-panel.is-collapsed{min-height:0;padding:10px 12px}
+.automation-grid>.sentinel-block{gap:6px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+.automation-grid .sentinel-content{min-width:0}
+.automation-grid .sentinel-title>label{font-size:12px}
+.automation-grid .sentinel-content p{margin-top:5px;font-size:11px;line-height:1.6}
+.automation-grid .sentinel-checkbox{margin:0;min-height:24px;font-size:11px}
+.automation-grid .sentinel-checkbox input{width:14px;height:14px}
+.automation-grid .relay-compact-bar{gap:6px}
+.automation-grid .relay-compact-bar>strong{font-size:12px}
+.automation-grid .relay-order-control select{min-height:27px;padding:3px 6px}
+.automation-grid .relay-options{margin-top:5px}
+.automation-grid .relay-options summary{font-size:10px}
+.automation-grid>#pool-panel{min-height:0}
+.automation-grid #pool-panel .account-overview,.automation-grid #pool-panel.is-collapsed .account-overview{min-height:0;gap:7px;padding:10px 12px}
+/* All three cards share a compact baseline height. */
+.automation-grid>#pool-panel,.automation-grid>.sentinel-block,.automation-grid>#relay-panel,.automation-grid>#relay-panel.is-collapsed{min-height:110px}
+.automation-grid #pool-panel .account-overview,.automation-grid #pool-panel.is-collapsed .account-overview{grid-template-columns:minmax(0,1fr) auto;min-height:108px;gap:6px 8px;padding:10px 12px}
+.automation-grid #pool-panel .account-current{grid-column:1/-1;gap:4px}
+.automation-grid #pool-panel .current-quota{gap:10px;min-width:0}
+.automation-grid #pool-panel .current-quota>div{gap:5px}
+.automation-grid #pool-panel .current-quota strong{font-size:13px}
+.automation-grid #pool-panel .account-overview>.auto-switch{font-size:10px;white-space:nowrap;gap:4px}
+@media(max-width:380px){.automation-grid #pool-panel .account-overview{grid-template-columns:1fr}.automation-grid #pool-panel .account-current{grid-column:auto}}
+/* Collapsed cards release their reserved height and hide secondary controls. */
+.automation-grid>.sentinel-block{grid-template-columns:minmax(0,1fr) auto 24px;gap:6px 3px}
+.automation-grid .sentinel-content{display:contents}
+.automation-grid .sentinel-title{grid-column:1;grid-row:1;gap:0}
+.automation-grid .sentinel-title .sentinel-info{width:20px;height:24px}
+.automation-grid .sentinel-checkbox{grid-column:2;grid-row:1;gap:3px}
+.automation-grid #sentinel-collapse{grid-column:3;grid-row:1}
+.automation-grid .sentinel-content>p{grid-column:1/-1;grid-row:2;margin:0}
+.automation-grid>#pool-panel.is-collapsed,.automation-grid>.sentinel-block.is-collapsed,.automation-grid>#relay-panel.is-collapsed{display:none!important}
+.automation-grid #pool-panel.is-collapsed .account-overview{min-height:46px;padding:10px 12px;display:block}
+.automation-grid #pool-panel.is-collapsed .current-quota,.automation-grid #pool-panel.is-collapsed .account-overview>.auto-switch{display:none}
+.automation-grid #pool-panel.is-collapsed .account-title-row{min-height:24px}
+.automation-grid #relay-panel.is-collapsed .relay-order-control,.automation-grid #relay-panel.is-collapsed #relay-resume,.automation-grid .sentinel-block.is-collapsed .sentinel-content>p,.automation-grid .sentinel-block.is-collapsed .sentinel-information{display:none}
+.sentinel-block.is-collapsed .panel-collapse-btn svg{transform:rotate(180deg)}

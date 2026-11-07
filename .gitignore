@@ -1,0 +1,6 @@
+data/
+logs/
+*.log
+*private.pem
+
+artifacts/private-isolation-check/

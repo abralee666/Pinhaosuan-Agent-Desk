@@ -1,0 +1,51 @@
+[
+  {
+    "id": "codex",
+    "name": "Codex",
+    "file": "codex.png",
+    "page": "https://openai.com/codex/",
+    "source": "Official installed Codex package assets/Square44x44Logo.targetsize-96_altform-lightunplated.png"
+  },
+  {
+    "id": "antigravity",
+    "name": "Antigravity",
+    "file": "antigravity.png",
+    "page": "https://antigravity.google/",
+    "source": "Official installed Antigravity.exe application icon"
+  },
+  {
+    "id": "cursor",
+    "name": "Cursor",
+    "file": "cursor.svg",
+    "page": "https://cursor.com/",
+    "source": "https://cursor.com/marketing-static/favicon-light.svg"
+  },
+  {
+    "id": "claude",
+    "name": "Claude Code",
+    "file": "claude.png",
+    "page": "https://claude.com/product/claude-code",
+    "source": "https://claude.com/icon.png"
+  },
+  {
+    "id": "coze",
+    "name": "Coze",
+    "file": "coze.ico",
+    "page": "https://www.coze.cn/",
+    "source": "https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/coze-space/static/favicon2.ico"
+  },
+  {
+    "id": "workbuddy",
+    "name": "WorkBuddy",
+    "file": "workbuddy.svg",
+    "page": "https://www.workbuddy.ai/",
+    "source": "https://download.codebuddy.ai/web/workbuddy/f5bce0c03cdc17fa28d25634fb48d2791c297da3/assets/logo.svg"
+  },
+  {
+    "id": "kiro",
+    "name": "Kiro",
+    "file": "kiro.svg",
+    "page": "https://kiro.dev/",
+    "source": "https://kiro.dev/icon.svg"
+  }
+]

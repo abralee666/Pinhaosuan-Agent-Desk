@@ -1,0 +1,21 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {generateKeyPairSync,sign,randomUUID} from 'node:crypto';
+import {Membership,PLANS,verifyLicense} from '../lib/membership.mjs';
+const keys=generateKeyPairSync('ed25519'),publicKey=keys.publicKey.export({type:'spki',format:'pem'});
+const license=(id,plan,expiresAt)=>{const p=Buffer.from(JSON.stringify({version:1,installationId:id,plan,expiresAt})).toString('base64url');return p+'.'+sign(null,Buffer.from(p),keys.privateKey).toString('base64url');};
+test('Plus, Ultra and Pro retain annual pricing; Free has one platform and one account',()=>{for(const p of PLANS.slice(1,4))assert.ok(Math.abs(p.annual/(p.monthly*12)-.8)<.003);const m=new Membership({});m.claim('codex','a');assert.throws(()=>m.claim('codex','b'),/最多/);assert.throws(()=>m.claim('antigravity','a'),/最多/);assert.throws(()=>m.assertRemote(),/付费/);m.release('codex','a');m.claim('antigravity','a');assert.equal(m.slots().length,1);});
+test('basic permits two accounts PER platform, plus permits five PER platform',()=>{for(const plan of PLANS.slice(1,3)){const m=new Membership({},{publicKey});m.activate(license(m.state.membership.installationId,plan.id,Date.now()+86400000));for(let p=0;p<plan.platforms;p++)for(let a=0;a<plan.accounts;a++)m.claim('p'+p,'a'+a);assert.equal(m.slots().length,plan.platforms*plan.accounts);assert.throws(()=>m.claim('p0','extra'),/最多/);assert.throws(()=>m.claim('extra','a'),/最多/);m.assertRemote();}});
+test('unlimited removes the previous eight-account cap and public snapshots hide the license',()=>{const m=new Membership({},{publicKey});m.activate(license(m.state.membership.installationId,'unlimited',Date.now()+86400000));for(let n=0;n<40;n++)m.claim('p'+n,'a');assert.equal(m.slots().length,40);assert.equal(m.snapshot().license,undefined);});
+test('forgery, wrong installation, missing key and expiry never grant paid rights',()=>{let now=Date.now();const m=new Membership({},{publicKey,now:()=>now});const token=license(m.state.membership.installationId,'basic',now+1000);m.activate(token);m.claim('codex','a');m.claim('codex','b');assert.equal(verifyLicense(token,publicKey,randomUUID()),null);assert.equal(verifyLicense(token,null,m.state.membership.installationId),null);assert.throws(()=>m.activate(token+'x'),/无效/);now+=2000;assert.equal(m.plan().id,'free');assert.equal(m.slots().length,1);assert.throws(()=>m.assertRemote(),/付费/);assert.equal(m.state.membership.slots.length,2,'downgrading must not erase account history');});
+test('Max accepts signed licenses, grants Pro capacity and two monthly service entitlements, and expires normally',()=>{
+  let now=Date.now();const m=new Membership({},{publicKey,now:()=>now});
+  const token=license(m.state.membership.installationId,'max',now+365*86400000);m.activate(token);
+  const max=m.snapshot().plan;assert.equal(max.name,'Max');assert.equal(max.monthly,199.9);assert.equal(max.annual,1199.9);
+  assert.equal(max.humanSupportMonthly,2);assert.equal(max.limitedAvailability,true);
+  assert.equal(max.platforms,null);assert.equal(max.accounts,null);m.assertRemote();
+  for(let p=0;p<8;p++)for(let a=0;a<8;a++)m.claim('p'+p,'a'+a);assert.equal(m.slots().length,64);
+  assert.equal(verifyLicense(token,publicKey,randomUUID()),null);assert.throws(()=>m.activate(token+'x'),/无效/);
+  now+=366*86400000;assert.equal(m.plan().id,'free');assert.equal(m.plan().humanSupportMonthly,undefined);
+  assert.equal(m.slots().length,1);assert.equal(m.state.membership.slots.length,64);assert.throws(()=>m.assertRemote(),/付费/);
+});

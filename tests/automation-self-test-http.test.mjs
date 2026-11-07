@@ -1,0 +1,38 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import net from 'node:net';
+import {spawn} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+import {randomUUID} from 'node:crypto';
+import {Store} from '../lib/store.mjs';
+async function port(){const s=net.createServer();await new Promise(r=>s.listen(0,'127.0.0.1',r));const p=s.address().port;await new Promise(r=>s.close(r));return p;}
+test('self-test HTTP creates an isolated wait, rejects duplicates, cancels without inference without a public UI',{timeout:20000},async t=>{
+ const data=fs.mkdtempSync(path.join(os.tmpdir(),'desk-test-http-')),root=path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+ const store=new Store(data,{empty:true});
+ const original=store.createTask('Existing task','live');original.status='completed';
+ const profile={id:'self-test-account',source:'local-session',enabled:true,session:'signed_in',quota:{fiveHour:{remaining:100},weekly:{remaining:100}},checkedAt:new Date().toISOString()};
+ const group=store.state.accountManager.providers.codex;group.accounts=[profile];group.activeAccountId=profile.id;store.save();
+ const p=await port(),remote=await port(),origin=`http://127.0.0.1:${p}`;
+ const child=spawn(process.execPath,['server.mjs'],{cwd:root,windowsHide:true,env:{...process.env,AGENT_DESK_EDITION:'commercial',PORT:String(p),AGENT_DESK_REMOTE_PORT:String(remote),AGENT_DESK_DATA:data,AGENT_DESK_TEST_NETWORK:'1'},stdio:['ignore','pipe','pipe']});
+ t.after(async()=>{if(child.exitCode===null){const end=new Promise(r=>child.once('exit',r));child.kill();await end;}fs.rmSync(data,{recursive:true,force:true});});
+ await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('error',reject);child.once('exit',code=>reject(Error('server exit '+code)));});
+ const landing=await fetch(origin+'/workspace'),cookie=landing.headers.get('set-cookie').split(';')[0];
+ const state=async()=>await(await fetch(origin+'/api/state',{headers:{Cookie:cookie}})).json();
+ const post=(route,body,id=randomUUID())=>fetch(origin+'/api/'+route,{method:'POST',headers:{Cookie:cookie,Origin:origin,'X-Agent-Desk':'1','X-Request-Id':id,'Content-Type':'application/json'},body:JSON.stringify(body)});
+ assert.equal((await fetch(origin+'/automation-test-ui.js')).status,404);
+ assert.equal((await post('automation/self-test',{kind:'invalid',provider:'codex'})).status,400);
+ const requestId=randomUUID(),body={kind:'sentinel',provider:'codex'};
+ const created=await post('automation/self-test',body,requestId);assert.equal(created.status,200);const {taskId}=await created.json();
+ const replay=await post('automation/self-test',body,requestId);assert.equal((await replay.json()).taskId,taskId);
+ assert.equal((await post('automation/self-test',body)).status,400);
+ const s=await state(),task=s.tasks.find(t=>t.id===taskId);
+ assert.equal(s.runtime.busy,false);assert.equal(task.quotaWait.status,'scheduled');assert.equal(task.selfTest.phase,'waiting');
+ assert.notEqual(task.workspace,original.workspace);assert.equal(task.executionMode,'read-only');
+ assert.equal(s.tasks.find(t=>t.id===original.id).status,'completed');assert.deepEqual(s.accountManager.providers.codex.accounts[0].quota,profile.quota);
+ assert.equal((await post('quota-resume/check',{taskId})).status,400);
+ assert.equal((await post('stop',{taskId})).status,200);
+ const after=await state();assert.equal(after.tasks.find(t=>t.id===taskId).selfTest.phase,'canceled');assert.equal(after.runtime.busy,false);
+});
