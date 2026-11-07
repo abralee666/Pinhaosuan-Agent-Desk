@@ -41,11 +41,12 @@
 ## 演示视频与最新界面展示
 
 ### 1. 核心工作流演示视频
-[![点击播放实机演示视频](docs/showcase/video-cover.png)](https://github.com/abralee666/Pinhaosuan-Agent-Desk/blob/main/docs/showcase/demo.mp4)
+[![点击前往哔哩哔哩观看完整实机演示](docs/showcase/video-cover.png)](https://www.bilibili.com/video/BV1Hf4E6fELs/)
 
 > [!TIP]
-> **[▶️ 点击上方封面或此处，在 GitHub 原生在线播放实机演示视频 (demo.mp4)](https://github.com/abralee666/Pinhaosuan-Agent-Desk/blob/main/docs/showcase/demo.mp4)**  
-> *(如需直接下载视频文件，可点击：[原始视频下载](https://github.com/abralee666/Pinhaosuan-Agent-Desk/raw/main/docs/showcase/demo.mp4))*
+> **[▶️ 点击上方封面或此处，前往哔哩哔哩观看完整实机演示视频（1080P 超清流畅）](https://www.bilibili.com/video/BV1Hf4E6fELs/)**  
+> *视频主题：《为解决5H限额和利用低价订阅而生的AI工作台》*
+
 * **操作版本说明**：该视频录制于 **v0.1 早期原型版本**，主要用于验证核心功能链路（本地任务建立、多轮对话推进、检查点保存以及额度耗尽时的换号与接力机制）。
 * **当前版本演进**：当前发布的 **v0.3.0 正式版**在界面视觉、响应速度、移动端抽屉式体验以及自定义平台扩展性上，均已完成深度重构与全面演进。
 
